@@ -76,6 +76,4 @@ def remove(_id):
     data.remove(data_user)
     return "user deleted"
 
-
-
 app.run(host='0.0.0.0', port=5000)
