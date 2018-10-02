@@ -30,8 +30,7 @@ class User(Base):
     def set_password(self, password):
         self.__password = password
 
-    def __init__(self, id, nom,email,password):
-        self.id = id
+    def __init__(self, nom,email,password,*args, **kwargs):
         self.nom = nom
         self.email = email
         self.password = password

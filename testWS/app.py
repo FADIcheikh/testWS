@@ -93,7 +93,9 @@ def update(_id):
     nom = content['nom']
     email = content['email']
     password = content['password']
-    updated_user = Data.User(_id,nom,email,password)
+    updated_user = Data.User(nom,email,password, kwargs={'id': _id})
+    updated_user.id = _id
+    print updated_user.id
 
     for user in data:
         if _id == user.id:
@@ -111,20 +113,13 @@ def update(_id):
 @app.route('/removejson/<int:_id>', methods=['DELETE'])
 def remove(_id):
     user_to_delete = [e for e in data if e.id == _id][0]
-    """
-    content = request.get_json()
-    nom = content['nom']
-    email = content['email']
-    password = content['password']
-    user_to_delete = Data.User(_id,nom,email,password)
-    """
-    for user in data:
-        if _id == user.id:
+    for user_x in data:
+        if _id == user_x.id:
             #index= data.index(user)
-            print user
+            print user_x
             print user_to_delete
-            user = user_to_delete
-            session.delete(user)
+            #user_x = user_to_delete
+            session.delete(user_x)
             session.flush()
             session.commit()
 
