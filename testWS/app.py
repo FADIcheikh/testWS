@@ -1,10 +1,33 @@
 #!flask/bin/python
-from flask import Flask,jsonify
+from flask import Flask,jsonify,current_app
 from flask import request
+import queries as qs
+import json
+
 
 app = Flask(__name__)
 
 
+with app.app_context():
+    # within this block, current_app points to app.
+    print current_app.name
+
+
+data = qs.getAllUsers()
+
+#create list of user dictionaries
+datadict= []
+for user in data:
+    del user.__dict__['_sa_instance_state']
+    #print user.__dict__
+    datadict.append(user.__dict__)
+
+#convert dictionary list to json
+jsondata=json.dumps(datadict)
+print "objects serialized: " + jsondata
+
+
+"""
 data = [{
     "id": 22,
     "name": "fadi"
@@ -13,6 +36,7 @@ data = [{
     "id": 20,
     "name": "xxx"
     }]
+"""
 
 
 ##############################################################
@@ -75,5 +99,11 @@ def remove(_id):
             data_user = user
     data.remove(data_user)
     return "user deleted"
+
+
+
+
+
+
 
 app.run(host='0.0.0.0', port=5000)
