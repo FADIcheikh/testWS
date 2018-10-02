@@ -1,8 +1,10 @@
 #!flask/bin/python
 from flask import Flask,jsonify,current_app
 from flask import request
-import queries as qs
 import json
+import Data
+from Data import User
+from base import session
 
 
 app = Flask(__name__)
@@ -13,8 +15,9 @@ with app.app_context():
     print current_app.name
 
 
-data = qs.getAllUsers()
 
+data =  session.query(User).all()
+print data
 #create list of user dictionaries
 datadict= []
 for user in data:
@@ -24,6 +27,7 @@ for user in data:
 
 #convert dictionary list to json
 jsondata=json.dumps(datadict)
+data_json = json.loads(jsondata)
 print "objects serialized: " + jsondata
 
 
@@ -47,8 +51,13 @@ data = [{
 def post():
     print(request.is_json)
     content = request.get_json()
-    print(content['id'])
-    print(content['name'])
+    nom = content['nom']
+    email = content['email']
+    password = content['password']
+    user = Data.User(nom,email,password)
+    #print user.toString()
+    session.add(user)
+    session.commit()
     return 'JSON posted'
 
 ##############################################################
@@ -58,8 +67,8 @@ def post():
 @app.route('/getjson', methods=['GET'])
 def getAll():
     print(request.is_json)
-    print data
-    return jsonify({"data": data})
+    #print data
+    return jsonify({"data": jsondata})
 
 ##############################################################
 #######################GET ONE################################
@@ -67,10 +76,10 @@ def getAll():
 
 @app.route('/getjson/<int:id>', methods=['GET'])
 def getById(id):
-    for user in data:
+    for user in data_json:
         if id == user['id']:
             data_user = user  # type: Dict[str, str]
-            print data_user
+            #print data_user
     return jsonify(data_user)
 
 ##############################################################
@@ -79,14 +88,21 @@ def getById(id):
 
 @app.route('/updatejson/<int:_id>', methods=['PUT'])
 def update(_id):
-    update_req = request.json
+    #update_req = request.json
+    content = request.get_json()
+    nom = content['nom']
+    email = content['email']
+    password = content['password']
+    updated_user = Data.User(_id,nom,email,password)
+
     for user in data:
-        if _id == user['id']:
-            index= data.index(user)
-            data_user = user
-            data_user = update_req
-    data[index]= data_user
-    return jsonify(data_user)
+        if _id == user.id:
+            #index= data.index(user)
+            user = updated_user
+            session.merge(user)
+            session.flush()
+            session.commit()
+    return "user updated "
 
 ##############################################################
 ########################REMOVE################################
@@ -94,16 +110,25 @@ def update(_id):
 
 @app.route('/removejson/<int:_id>', methods=['DELETE'])
 def remove(_id):
+    user_to_delete = [e for e in data if e.id == _id][0]
+    """
+    content = request.get_json()
+    nom = content['nom']
+    email = content['email']
+    password = content['password']
+    user_to_delete = Data.User(_id,nom,email,password)
+    """
     for user in data:
-        if _id == user['id']:
-            data_user = user
-    data.remove(data_user)
+        if _id == user.id:
+            #index= data.index(user)
+            print user
+            print user_to_delete
+            user = user_to_delete
+            session.delete(user)
+            session.flush()
+            session.commit()
+
     return "user deleted"
-
-
-
-
-
 
 
 app.run(host='0.0.0.0', port=5000)

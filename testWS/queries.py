@@ -1,5 +1,6 @@
 from base import Session
 from Data import User
+from sqlalchemy import update
 
 from flask import Flask,jsonify
 
@@ -16,7 +17,7 @@ def getAllUsers():
 """for user in getAllUsers():
     print user.toString()"""
 
-# 3 - extract a user
+# 4 - extract a user
 def getUserByYd(_id):
     user = session.query(User).filter(User.id == _id)
     return user
@@ -24,3 +25,22 @@ def getUserByYd(_id):
 #test get a user
 """for user in getUserByYd(1):
     print user.toString()"""
+
+# 5 - update a user
+def updateUser(_id,user):
+    user = session.query(User).filter(User.id == _id).update(user)
+    session.commit()
+
+#updateUser(5)
+
+# 6 - remove a user
+def removeUser(user):
+    session.delete(user)
+    session.commit()
+
+
+# 6 - add a user
+def addUser(user):
+    session.add(user)
+    session.commit()
+
