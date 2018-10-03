@@ -4,7 +4,7 @@ from flask import request
 import json
 import Data
 from Data import User
-from base import session
+from base import session,session2
 
 
 app = Flask(__name__)
@@ -95,7 +95,6 @@ def update(_id):
     password = content['password']
     updated_user = Data.User(nom,email,password, kwargs={'id': _id})
     updated_user.id = _id
-    print updated_user.id
 
     for user in data:
         if _id == user.id:
@@ -112,16 +111,24 @@ def update(_id):
 
 @app.route('/removejson/<int:_id>', methods=['DELETE'])
 def remove(_id):
-    user_to_delete = [e for e in data if e.id == _id][0]
+    session2.query(Data.User).filter(User.id ==_id).delete()
+    session2.commit()
+
+
+    """
     for user_x in data:
         if _id == user_x.id:
-            #index= data.index(user)
-            print user_x
-            print user_to_delete
+            index= data.index(user)
             #user_x = user_to_delete
-            session.delete(user_x)
-            session.flush()
-            session.commit()
+            user_x = data[index]
+    del data[index]
+    print user_x
+    session.flush()
+    session.commit()
+    session.expire_all()"""
+
+
+
 
     return "user deleted"
 
