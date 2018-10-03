@@ -14,38 +14,10 @@ with app.app_context():
     # within this block, current_app points to app.
     print current_app.name
 
-
-
-data =  session.query(User).all()
-print data
-#create list of user dictionaries
-datadict= []
-for user in data:
-    del user.__dict__['_sa_instance_state']
-    #print user.__dict__
-    datadict.append(user.__dict__)
-
-#convert dictionary list to json
-jsondata=json.dumps(datadict)
-data_json = json.loads(jsondata)
-print "objects serialized: " + jsondata
-
-
-"""
-data = [{
-    "id": 22,
-    "name": "fadi"
-},
-    {
-    "id": 20,
-    "name": "xxx"
-    }]
-"""
-
-
 ##############################################################
 #########################POST#################################
 ##############################################################
+
 
 @app.route('/postjson', methods=['POST'])
 def post():
@@ -55,64 +27,81 @@ def post():
     email = content['email']
     password = content['password']
     user = Data.User(nom,email,password)
-    #print user.toString()
     session.add(user)
+    session.flush()
     session.commit()
-    session.expire_all()
     return 'JSON posted'
 
 ##############################################################
-#######################GET ALL################################
+##################GET ALL+GEt By ID###########################
 ##############################################################
 
-@app.route('/getjson', methods=['GET'])
-def getAll():
-    print(request.is_json)
-    #print data
+
+@app.route('/getjson',defaults={'_id': None}, methods=['GET'])
+@app.route('/getjson/<int:_id>', methods=['GET'])
+def getAll(_id):
+    data = session.query(User).all()
+    # create list of user dictionaries
+    datadict = []
+    for user in data:
+        del user.__dict__['_sa_instance_state']
+        # print user.__dict__
+        datadict.append(user.__dict__)
+
+    # convert dictionary list to json
+    print request.args
+    jsondata = json.dumps(datadict)
+    data_json = json.loads(jsondata)
+
+    if _id == None:
+         print "get All"
+    else:
+        for user in data_json:
+            if _id == user['id']:
+                data_user = user  # type: Dict[str, str]
+                # print data_user
+                return jsonify(data_user)
     return jsonify({"data": jsondata})
 
 ##############################################################
 #######################GET ONE################################
 ##############################################################
 
+"""
 @app.route('/getjson/<int:id>', methods=['GET'])
 def getById(id):
     for user in data_json:
         if id == user['id']:
             data_user = user  # type: Dict[str, str]
             #print data_user
-    return jsonify(data_user)
+    return jsonify(data_user)"""
 
 ##############################################################
 ########################UPDATE################################
 ##############################################################
 
+
 @app.route('/updatejson/<int:_id>', methods=['PUT'])
 def update(_id):
-    #update_req = request.json
     content = request.get_json()
     nom = content['nom']
     email = content['email']
     password = content['password']
     updated_user = Data.User(nom,email,password, kwargs={'id': _id})
     updated_user.id = _id
-    for user in data:
-        if _id == user.id:
-            #index= data.index(user)
-            user = updated_user
-            session.merge(user)
-            session.flush()
-            session.commit()
-    session.expire_all()
+    session.merge(updated_user)
+    session.flush()
+    session.commit()
     return "user updated "
 
 ##############################################################
 ########################REMOVE################################
 ##############################################################
 
+
 @app.route('/removejson/<int:_id>', methods=['DELETE'])
 def remove(_id):
-    session2.query(Data.User).filter(User.id ==_id).delete()
+    session2.query(Data.User).filter(User.id == _id).delete()
     session2.commit()
     session2.close()
     session.expire_all()
