@@ -58,6 +58,7 @@ def post():
     #print user.toString()
     session.add(user)
     session.commit()
+    session.expire_all()
     return 'JSON posted'
 
 ##############################################################
@@ -95,7 +96,6 @@ def update(_id):
     password = content['password']
     updated_user = Data.User(nom,email,password, kwargs={'id': _id})
     updated_user.id = _id
-
     for user in data:
         if _id == user.id:
             #index= data.index(user)
@@ -103,6 +103,7 @@ def update(_id):
             session.merge(user)
             session.flush()
             session.commit()
+    session.expire_all()
     return "user updated "
 
 ##############################################################
@@ -113,22 +114,8 @@ def update(_id):
 def remove(_id):
     session2.query(Data.User).filter(User.id ==_id).delete()
     session2.commit()
-
-
-    """
-    for user_x in data:
-        if _id == user_x.id:
-            index= data.index(user)
-            #user_x = user_to_delete
-            user_x = data[index]
-    del data[index]
-    print user_x
-    session.flush()
-    session.commit()
-    session.expire_all()"""
-
-
-
+    session2.close()
+    session.expire_all()
 
     return "user deleted"
 
