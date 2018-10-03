@@ -30,6 +30,7 @@ def post():
     session.add(user)
     session.flush()
     session.commit()
+
     return 'JSON posted'
 
 ##############################################################
@@ -61,6 +62,7 @@ def getAll(_id):
                 data_user = user  # type: Dict[str, str]
                 # print data_user
                 return jsonify(data_user)
+
     return jsonify({"data": jsondata})
 
 ##############################################################
@@ -92,6 +94,7 @@ def update(_id):
     session.merge(updated_user)
     session.flush()
     session.commit()
+
     return "user updated "
 
 ##############################################################
