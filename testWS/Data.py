@@ -23,7 +23,6 @@ class User(Base):
     def set_email(self, email):
         self.__email = email
 
-
     def get_password(self):
         return self.__password
 
@@ -46,3 +45,9 @@ class User(Base):
     def getUserById(self,_id):
         if self.id == _id:
             return self
+
+    def equalsTo(self,User):
+        if self.id == User.id:
+            return True
+        else:
+            return False

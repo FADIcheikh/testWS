@@ -5,9 +5,11 @@ import json
 import Data
 from Data import User
 from base import session,session2
-
+import redis
 
 app = Flask(__name__)
+
+r = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 
 with app.app_context():
@@ -62,7 +64,7 @@ def getAll(_id):
                 data_user = user  # type: Dict[str, str]
                 # print data_user
                 return jsonify(data_user)
-
+    r.set("data", jsondata)
     return jsonify({"data": jsondata})
 
 ##############################################################
