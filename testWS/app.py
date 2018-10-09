@@ -65,7 +65,7 @@ def getAll(_id):
                 # print data_user
                 return jsonify(data_user)
     r.set("data", jsondata)
-    return jsonify({"data": jsondata})
+    return jsonify(jsondata)
 
 ##############################################################
 #######################GET ONE################################

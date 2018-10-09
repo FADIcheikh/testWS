@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import orm
 
-engine = create_engine('mysql+pymysql://root@localhost:3306/test_projet')
+engine = create_engine('mysql+pymysql://root@localhost:3306/test_projet', pool_pre_ping=True)
 Session = sessionmaker(bind=engine)
 
 sm = orm.sessionmaker(bind=engine, autoflush=True, autocommit=False,
