@@ -6,8 +6,10 @@ import Data
 from Data import User
 from base import session,session2
 import redis
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 r = redis.StrictRedis(host='localhost', port=6379, db=0)
 
@@ -33,7 +35,7 @@ def post():
     session.flush()
     session.commit()
 
-    return 'JSON posted'
+    return 'User added'
 
 ##############################################################
 ##################GET ALL+GEt By ID###########################
@@ -65,7 +67,7 @@ def getAll(_id):
                 # print data_user
                 return jsonify(data_user)
     r.set("data", jsondata)
-    return jsonify(jsondata)
+    return jsondata
 
 ##############################################################
 #######################GET ONE################################
